@@ -215,6 +215,7 @@ processResources {
     filesMatching(resourceTargets) {
         expand replaceProperties
     }
+    duplicatesStrategy = 'exclude'
 }
 
 // Example for how to get properties into the manifest for reading at runtime.
