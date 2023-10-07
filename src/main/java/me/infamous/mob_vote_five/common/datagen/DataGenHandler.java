@@ -8,9 +8,15 @@ import me.infamous.mob_vote_five.common.registry.MVItems;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.EntityLoot;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.tags.BiomeTagsProvider;
+import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
@@ -98,6 +104,32 @@ public class DataGenHandler {
                         return MVEntityTypes.getKnownEntities();
                     }
                 }, LootContextParamSets.ENTITY));
+            }
+        });
+
+        BlockTagsProvider blockTagsProvider = new BlockTagsProvider(generator, MobVote2023.MODID, existingFileHelper){
+            @Override
+            protected void addTags() {
+                this.tag(MVTags.PENGUINS_SPAWNABLE_ON).add(Blocks.GRASS_BLOCK, Blocks.SNOW, Blocks.SNOW_BLOCK, Blocks.SAND);
+                this.tag(MVTags.CRABS_SPAWNABLE_ON).add(Blocks.GRASS_BLOCK, Blocks.MUD, Blocks.MANGROVE_ROOTS, Blocks.MUDDY_MANGROVE_ROOTS);
+
+            }
+        };
+        generator.addProvider(server, blockTagsProvider);
+
+        generator.addProvider(server, new ItemTagsProvider(generator, blockTagsProvider, MobVote2023.MODID, existingFileHelper){
+            @Override
+            protected void addTags() {
+                this.tag(MVTags.CRAB_FOOD).add(Blocks.SEAGRASS.asItem());
+                this.tag(MVTags.PENGUIN_FOOD).addTag(ItemTags.FISHES);
+                this.tag(MVTags.ARMADILLO_FOOD).add(Items.SPIDER_EYE);
+            }
+        });
+
+        generator.addProvider(server, new BiomeTagsProvider(generator, MobVote2023.MODID, existingFileHelper){
+
+            @Override
+            protected void addTags() {
             }
         });
     }

@@ -1,0 +1,11 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": "minecraft:stony_shore",
+  "spawners":
+  {
+    "type": "mob_vote_five:penguin",
+    "weight": 10,
+    "minCount": 2,
+    "maxCount": 5
+  }
+}

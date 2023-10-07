@@ -22,7 +22,7 @@ public class MVItems {
 
     public static final RegistryObject<Item> ARMADILLO_SCUTE = ITEMS.register("armadillo_scute", () -> new Item((new Item.Properties()).tab(CreativeModeTab.TAB_MATERIALS)));
 
-    public static final RegistryObject<Item> CRAB_CLAW = ITEMS.register("crab_claw", () -> new CrabClawItem((new Item.Properties()).tab(CreativeModeTab.TAB_TOOLS), 2.0F));
+    public static final RegistryObject<Item> CRAB_CLAW = ITEMS.register("crab_claw", () -> new CrabClawItem((new Item.Properties().stacksTo(1)).tab(CreativeModeTab.TAB_TOOLS), 2.0F));
 
     private static <T extends Mob> RegistryObject<Item> registerSpawnEgg(String name, RegistryObject<EntityType<T>> typeSupplier, int backgroundColor, int highlightColor) {
         return ITEMS.register(name, () -> new ForgeSpawnEggItem(typeSupplier, backgroundColor, highlightColor, (new Item.Properties()).tab(CreativeModeTab.TAB_MISC)));

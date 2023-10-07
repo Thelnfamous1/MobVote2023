@@ -27,7 +27,7 @@ public class ModClientEventHandlers {
     @SubscribeEvent
     static void onRenderRegistry(EntityRenderersEvent.RegisterLayerDefinitions event){
         event.registerLayerDefinition(MVModelLayers.ARMADILLO, () -> ArmadilloModel.createBodyLayer(CubeDeformation.NONE));
-        event.registerLayerDefinition(MVModelLayers.CRAB, () -> CrabModel.createBodyLayer(CubeDeformation.NONE));
+        event.registerLayerDefinition(MVModelLayers.CRAB, CrabModel::createBodyLayer);
         event.registerLayerDefinition(MVModelLayers.PENGUIN, () -> PenguinModel.createBodyLayer(CubeDeformation.NONE));
     }
 }

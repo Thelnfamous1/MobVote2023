@@ -27,6 +27,13 @@ public class ArmadilloRenderer extends MobRenderer<Armadillo, ArmadilloModel<Arm
     }
 
     @Override
+    protected void scale(Armadillo pLivingEntity, PoseStack pMatrixStack, float pPartialTickTime) {
+        if(pLivingEntity.isBaby()){
+            pMatrixStack.scale(0.5F, 0.5F, 0.5F);
+        }
+    }
+
+    @Override
     public ResourceLocation getTextureLocation(Armadillo pEntity) {
         return LOCATION;
     }

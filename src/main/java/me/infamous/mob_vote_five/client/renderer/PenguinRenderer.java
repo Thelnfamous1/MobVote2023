@@ -27,6 +27,13 @@ public class PenguinRenderer extends MobRenderer<Penguin, PenguinModel<Penguin>>
     }
 
     @Override
+    protected void scale(Penguin pLivingEntity, PoseStack pMatrixStack, float pPartialTickTime) {
+        if(pLivingEntity.isBaby()){
+            pMatrixStack.scale(0.5F, 0.5F, 0.5F);
+        }
+    }
+
+    @Override
     public ResourceLocation getTextureLocation(Penguin pEntity) {
         return LOCATION;
     }
