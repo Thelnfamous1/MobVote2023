@@ -21,15 +21,15 @@ public class MVEntityTypes {
 
     public static final RegistryObject<EntityType<Armadillo>> ARMADILLO = register("armadillo",
             EntityType.Builder.of(Armadillo::new, MobCategory.CREATURE)
-                    .sized(0.9F, 0.9F)
+                    .sized(0.95F, 0.95F)
                     .clientTrackingRange(10));
     public static final RegistryObject<EntityType<Crab>> CRAB = register("crab",
             EntityType.Builder.of(Crab::new, MobCategory.CREATURE)
-                    .sized(0.9F, 0.9F)
+                    .sized(0.95F, 0.5F)
                     .clientTrackingRange(10));
     public static final RegistryObject<EntityType<Penguin>> PENGUIN = register("penguin",
             EntityType.Builder.of(Penguin::new, MobCategory.CREATURE)
-                    .sized(0.9F, 0.9F)
+                    .sized(0.7F, 1.2F)
                     .clientTrackingRange(10));
 
     public static Iterable<EntityType<?>> getKnownEntities(){

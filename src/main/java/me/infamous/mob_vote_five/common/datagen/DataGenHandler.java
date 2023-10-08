@@ -10,6 +10,7 @@ import net.minecraft.data.loot.EntityLoot;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.tags.BiomeTagsProvider;
 import net.minecraft.data.tags.BlockTagsProvider;
+import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -123,6 +124,15 @@ public class DataGenHandler {
                 this.tag(MVTags.CRAB_FOOD).add(Blocks.SEAGRASS.asItem());
                 this.tag(MVTags.PENGUIN_FOOD).addTag(ItemTags.FISHES);
                 this.tag(MVTags.ARMADILLO_FOOD).add(Items.SPIDER_EYE);
+            }
+        });
+
+        generator.addProvider(server, new EntityTypeTagsProvider(generator, MobVote2023.MODID, existingFileHelper){
+
+            @Override
+            protected void addTags() {
+                this.tag(MVTags.PENGUIN_EGG_IGNORES_FALLING).add(EntityType.ZOMBIE, EntityType.HUSK, EntityType.DROWNED, EntityType.ZOMBIFIED_PIGLIN, EntityType.ZOMBIE_VILLAGER);
+                this.tag(MVTags.PENGUIN_EGG_IGNORES).add(EntityType.BAT);
             }
         });
 

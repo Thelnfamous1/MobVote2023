@@ -8,7 +8,6 @@ import me.infamous.mob_vote_five.client.renderer.model.ArmadilloModel;
 import me.infamous.mob_vote_five.client.renderer.model.CrabModel;
 import me.infamous.mob_vote_five.client.renderer.model.PenguinModel;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
-import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -26,8 +25,8 @@ public class ModClientEventHandlers {
 
     @SubscribeEvent
     static void onRenderRegistry(EntityRenderersEvent.RegisterLayerDefinitions event){
-        event.registerLayerDefinition(MVModelLayers.ARMADILLO, () -> ArmadilloModel.createBodyLayer(CubeDeformation.NONE));
+        event.registerLayerDefinition(MVModelLayers.ARMADILLO, ArmadilloModel::createBodyLayer);
         event.registerLayerDefinition(MVModelLayers.CRAB, CrabModel::createBodyLayer);
-        event.registerLayerDefinition(MVModelLayers.PENGUIN, () -> PenguinModel.createBodyLayer(CubeDeformation.NONE));
+        event.registerLayerDefinition(MVModelLayers.PENGUIN, PenguinModel::createBodyLayer);
     }
 }

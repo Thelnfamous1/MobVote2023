@@ -1,5 +1,6 @@
-package me.infamous.mob_vote_five.common.entity;
+package me.infamous.mob_vote_five.common.entity.ai;
 
+import me.infamous.mob_vote_five.common.entity.Greeter;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;

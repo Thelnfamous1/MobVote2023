@@ -1,6 +1,7 @@
 package me.infamous.mob_vote_five.common.entity;
 
 import me.infamous.mob_vote_five.common.datagen.MVTags;
+import me.infamous.mob_vote_five.common.entity.ai.WaveAtPlayerGoal;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -63,6 +64,11 @@ public class Crab extends Animal implements Greeter {
     }
 
     @Override
+    public boolean canBeLeashed(Player pPlayer) {
+        return false;
+    }
+
+    @Override
     public boolean isFood(ItemStack pStack) {
         return pStack.is(MVTags.CRAB_FOOD);
     }
@@ -98,6 +104,7 @@ public class Crab extends Animal implements Greeter {
 
         super.onSyncedDataUpdated(pKey);
     }
+
     @Override
     @Nullable
     protected SoundEvent getAmbientSound() {
