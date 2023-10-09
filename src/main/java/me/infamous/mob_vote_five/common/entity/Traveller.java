@@ -25,4 +25,8 @@ public interface Traveller {
     boolean isTravelling();
 
     void setTravelling(boolean travelling);
+
+    boolean wantsToTravel();
+
+    boolean wantsToStroll();
 }

@@ -13,13 +13,17 @@ public class SwimWithPlayerGoal<T extends Mob & Swimmer> extends Goal {
     private final T swimmer;
     private final double speedModifier;
     private final TargetingConditions playerTargeting;
+    private final double closeEnough;
+    private final double tooFar;
     @Nullable
     private Player player;
 
-    public SwimWithPlayerGoal(T swimmer, double pSpeedModifier, TargetingConditions playerTargeting) {
+    public SwimWithPlayerGoal(T swimmer, double pSpeedModifier, TargetingConditions playerTargeting, double closeEnough, double tooFar) {
         this.swimmer = swimmer;
         this.speedModifier = pSpeedModifier;
         this.playerTargeting = playerTargeting;
+        this.closeEnough = closeEnough;
+        this.tooFar = tooFar;
         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
     }
 
@@ -35,7 +39,7 @@ public class SwimWithPlayerGoal<T extends Mob & Swimmer> extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return this.player != null && this.player.isSwimming() && this.swimmer.distanceToSqr(this.player) < 256.0D;
+        return this.player != null && this.player.isSwimming() && this.swimmer.closerThan(this.player, this.tooFar);
     }
 
     @Override
@@ -53,7 +57,7 @@ public class SwimWithPlayerGoal<T extends Mob & Swimmer> extends Goal {
     @Override
     public void tick() {
         this.swimmer.getLookControl().setLookAt(this.player, (float)(this.swimmer.getMaxHeadYRot() + 20), (float)this.swimmer.getMaxHeadXRot());
-        if (this.swimmer.distanceToSqr(this.player) < 6.25D) {
+        if (this.swimmer.closerThan(this.player, this.closeEnough)) {
             this.swimmer.getNavigation().stop();
         } else {
             this.swimmer.getNavigation().moveTo(this.player, this.speedModifier);

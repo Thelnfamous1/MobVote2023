@@ -1,45 +1,45 @@
 package me.infamous.mob_vote_five.common.entity.ai.turtlelike;
 
-import me.infamous.mob_vote_five.common.entity.LaysEggs;
-import me.infamous.mob_vote_five.common.entity.HasHome;
 import me.infamous.mob_vote_five.common.entity.Traveller;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
-import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.phys.Vec3;
 
-public class TravelGoal<T extends Animal & Traveller & HasHome & LaysEggs> extends Goal {
+public class TravelGoal<T extends PathfinderMob & Traveller> extends Goal {
     private final T turtle;
     private final double speedModifier;
+    private final int maxXZDist;
+    private final int maxYDist;
     private boolean stuck;
 
-    public TravelGoal(T pTurtle, double pSpeedModifier) {
+    public TravelGoal(T pTurtle, double pSpeedModifier, int maxXZDist, int maxYDist) {
         this.turtle = pTurtle;
         this.speedModifier = pSpeedModifier;
+        this.maxXZDist = maxXZDist;
+        this.maxYDist = maxYDist;
     }
 
     @Override
     public boolean canUse() {
-        return !this.turtle.isGoingHome() && !this.turtle.hasEgg() && this.turtle.isInWater();
+        return this.turtle.wantsToTravel();
     }
 
     @Override
     public void start() {
-        int i = 512;
-        int j = 4;
-        RandomSource randomsource = this.turtle.getRandom();
-        int k = randomsource.nextInt(1025) - 512;
-        int l = randomsource.nextInt(9) - 4;
-        int i1 = randomsource.nextInt(1025) - 512;
-        if ((double)l + this.turtle.getY() > (double)(this.turtle.level.getSeaLevel() - 1)) {
-            l = 0;
+        RandomSource random = this.turtle.getRandom();
+        int randomX = random.nextInt(this.maxXZDist + 1) - this.maxXZDist;
+        int randomY = random.nextInt(this.maxYDist + 1) - this.maxYDist;
+        int randomZ = random.nextInt(this.maxXZDist + 1) - this.maxXZDist;
+        if ((double)randomY + this.turtle.getY() > (double)(this.turtle.level.getSeaLevel() - 1)) {
+            randomY = 0;
         }
 
-        BlockPos blockpos = new BlockPos((double)k + this.turtle.getX(), (double)l + this.turtle.getY(), (double)i1 + this.turtle.getZ());
-        this.turtle.setTravelPos(blockpos);
+        BlockPos targetPos = new BlockPos((double)randomX + this.turtle.getX(), (double)randomY + this.turtle.getY(), (double)randomZ + this.turtle.getZ());
+        this.turtle.setTravelPos(targetPos);
         this.turtle.setTravelling(true);
         this.stuck = false;
     }
@@ -72,7 +72,7 @@ public class TravelGoal<T extends Animal & Traveller & HasHome & LaysEggs> exten
 
     @Override
     public boolean canContinueToUse() {
-        return !this.turtle.getNavigation().isDone() && !this.stuck && !this.turtle.isGoingHome() && !this.turtle.isInLove() && !this.turtle.hasEgg();
+        return !this.turtle.getNavigation().isDone() && !this.stuck && this.turtle.wantsToTravel();
     }
 
     @Override

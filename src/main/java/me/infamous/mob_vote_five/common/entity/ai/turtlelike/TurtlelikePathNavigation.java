@@ -7,10 +7,10 @@ import net.minecraft.world.entity.ai.navigation.AmphibiousPathNavigation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
-public class TravellerPathNavigation<T extends Mob & Traveller> extends AmphibiousPathNavigation {
+public class TurtlelikePathNavigation<T extends Mob & Traveller> extends AmphibiousPathNavigation {
     private final T turtle;
 
-    public TravellerPathNavigation(T pTurtle, Level pLevel) {
+    public TurtlelikePathNavigation(T pTurtle, Level pLevel) {
         super(pTurtle, pLevel);
         this.turtle = pTurtle;
     }

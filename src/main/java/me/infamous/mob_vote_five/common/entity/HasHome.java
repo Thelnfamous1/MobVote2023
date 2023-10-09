@@ -25,4 +25,6 @@ public interface HasHome {
     boolean isGoingHome();
 
     void setGoingHome(boolean goingHome);
+
+    boolean wantsToGoHome();
 }

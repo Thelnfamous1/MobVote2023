@@ -1,6 +1,5 @@
 package me.infamous.mob_vote_five.common.entity.ai.turtlelike;
 
-import me.infamous.mob_vote_five.common.entity.LaysEggs;
 import me.infamous.mob_vote_five.common.entity.HasHome;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.PathfinderMob;
@@ -9,30 +8,24 @@ import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
-public class GoHomeGoal<T extends PathfinderMob & HasHome & LaysEggs> extends Goal {
-      private final T turtle;
-      private final double speedModifier;
-      private boolean stuck;
-      private int closeToHomeTryTicks;
-      private static final int GIVE_UP_TICKS = 600;
+public class GoHomeGoal<T extends PathfinderMob & HasHome> extends Goal {
+    private final T turtle;
+    private final double speedModifier;
+    private final double closeEnough;
+    private boolean stuck;
+    private int closeToHomeTryTicks;
+    private static final int GIVE_UP_TICKS = 600;
 
-    public GoHomeGoal(T pTurtle, double pSpeedModifier) {
-         this.turtle = pTurtle;
-         this.speedModifier = pSpeedModifier;
-      }
+    public GoHomeGoal(T pTurtle, double pSpeedModifier, double closeEnough) {
+        this.turtle = pTurtle;
+        this.speedModifier = pSpeedModifier;
+        this.closeEnough = closeEnough;
+    }
 
       @Override
       public boolean canUse() {
-         if (this.turtle.isBaby()) {
-            return false;
-         } else if (this.turtle.hasEgg()) {
-            return true;
-         } else if (this.turtle.getRandom().nextInt(reducedTickDelay(700)) != 0) {
-            return false;
-         } else {
-            return !this.turtle.getHomePos().closerToCenterThan(this.turtle.position(), 64.0D);
-         }
-      }
+        return this.turtle.wantsToGoHome();
+    }
 
     @Override
     public void start() {
@@ -48,7 +41,7 @@ public class GoHomeGoal<T extends PathfinderMob & HasHome & LaysEggs> extends Go
 
     @Override
     public boolean canContinueToUse() {
-         return !this.turtle.getHomePos().closerToCenterThan(this.turtle.position(), 7.0D) && !this.stuck && this.closeToHomeTryTicks <= this.adjustedTickDelay(GIVE_UP_TICKS);
+         return !this.turtle.getHomePos().closerToCenterThan(this.turtle.position(), this.closeEnough) && !this.stuck && this.closeToHomeTryTicks <= this.adjustedTickDelay(GIVE_UP_TICKS);
       }
 
     @Override

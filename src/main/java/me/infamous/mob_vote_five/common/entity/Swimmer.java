@@ -18,4 +18,6 @@ public interface Swimmer {
     void startBreaching();
 
     void stopBreaching();
+
+    boolean wantsToSwim();
 }
