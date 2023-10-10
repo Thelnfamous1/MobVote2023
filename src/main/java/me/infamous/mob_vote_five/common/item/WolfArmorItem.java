@@ -4,6 +4,8 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import me.infamous.mob_vote_five.MobVote2023;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -49,6 +51,7 @@ public class WolfArmorItem extends Item {
                         pTarget.spawnAtLocation(oldArmor);
                     }
                     setArmor(pTarget, pStack.copy());
+                    pTarget.level.playSound(null, pTarget, SoundEvents.ARMOR_EQUIP_GENERIC, SoundSource.NEUTRAL, 0.5F, 1.0F);
                     pTarget.level.gameEvent(pTarget, GameEvent.EQUIP, pTarget.position());
                     pStack.shrink(1);
                 }
