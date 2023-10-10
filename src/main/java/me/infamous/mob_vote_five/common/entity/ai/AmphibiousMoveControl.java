@@ -10,13 +10,15 @@ public class AmphibiousMoveControl extends MoveControl {
    private final int maxTurnX;
    private final int maxTurnY;
    private final float inWaterSpeedModifier;
+   private final float outsideWaterSpeedModifier;
    private final boolean applyGravity;
 
-   public AmphibiousMoveControl(Mob pMob, int pMaxTurnX, int pMaxTurnY, float pInWaterSpeedModifier, boolean pApplyGravity) {
+   public AmphibiousMoveControl(Mob pMob, int pMaxTurnX, int pMaxTurnY, float pInWaterSpeedModifier, float pOutsideWaterSpeedModifier, boolean pApplyGravity) {
       super(pMob);
       this.maxTurnX = pMaxTurnX;
       this.maxTurnY = pMaxTurnY;
       this.inWaterSpeedModifier = pInWaterSpeedModifier;
+      this.outsideWaterSpeedModifier = pOutsideWaterSpeedModifier;
       this.applyGravity = pApplyGravity;
    }
 
@@ -44,11 +46,10 @@ public class AmphibiousMoveControl extends MoveControl {
                   this.mob.setXRot(this.rotlerp(this.mob.getXRot(), targetXRot, 5.0F));
                }
 
-               float moveX = Mth.cos(this.mob.getXRot() * ((float)Math.PI / 180F));
-               float moveY = Mth.sin(this.mob.getXRot() * ((float)Math.PI / 180F));
-               this.mob.zza = moveX * speed;
-               this.mob.yya = -moveY * speed;
-
+               float relativeForward = Mth.cos(this.mob.getXRot() * ((float)Math.PI / 180F));
+               float relativeVertical = Mth.sin(this.mob.getXRot() * ((float)Math.PI / 180F));
+               this.mob.zza = relativeForward * speed;
+               this.mob.yya = -relativeVertical * speed;
             }
          } else{
             this.mob.setSpeed(0.0F);

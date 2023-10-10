@@ -19,5 +19,7 @@ public interface Swimmer {
 
     void stopBreaching();
 
-    boolean wantsToSwim();
+    boolean wantsToFindWater();
+
+    boolean canSwimWithPlayer(Player player);
 }

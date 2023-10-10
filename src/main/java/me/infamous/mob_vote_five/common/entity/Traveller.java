@@ -28,5 +28,7 @@ public interface Traveller {
 
     boolean wantsToTravel();
 
+    boolean canContinueTravelling();
+
     boolean wantsToStroll();
 }

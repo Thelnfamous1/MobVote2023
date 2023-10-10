@@ -3,69 +3,53 @@ package me.infamous.mob_vote_five.client.renderer.model;// Made with Blockbench 
 // Paste this class into your mod and generate all required imports
 
 
-import me.infamous.mob_vote_five.client.animation.PenguinAnimation;
+import me.infamous.mob_vote_five.MobVote2023;
 import me.infamous.mob_vote_five.common.entity.Penguin;
-import net.minecraft.client.model.HierarchicalModel;
-import net.minecraft.client.model.geom.ModelPart;
-import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.resources.ResourceLocation;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
+import software.bernie.geckolib3.core.processor.IBone;
+import software.bernie.geckolib3.model.AnimatedGeoModel;
+import software.bernie.geckolib3.model.provider.data.EntityModelData;
 
-public class PenguinModel<T extends Penguin> extends HierarchicalModel<T> {
-	private final ModelPart root;
-	private final ModelPart penguin;
+import java.util.List;
 
-	public PenguinModel(ModelPart root) {
-		this.root = root;
-		this.penguin = root.getChild("penguin");
-	}
+public class PenguinModel<T extends Penguin> extends AnimatedGeoModel<T> {
 
-	public static LayerDefinition createBodyLayer() {
-		MeshDefinition meshdefinition = new MeshDefinition();
-		PartDefinition partdefinition = meshdefinition.getRoot();
+	public static final ResourceLocation ANIMATION_LOCATION = new ResourceLocation(MobVote2023.MODID, "animations/penguin.animation.json");
+	public static final ResourceLocation MODEL_LOCATION = new ResourceLocation(MobVote2023.MODID, "geo/penguin.geo.json");
+	public static final ResourceLocation TEXTURE_LOCATION = new ResourceLocation(MobVote2023.MODID, "textures/entity/penguin/penguin.png");
 
-		PartDefinition penguin = partdefinition.addOrReplaceChild("penguin", CubeListBuilder.create().texOffs(0, 0).addBox(-5.0F, -5.933F, -3.384F, 10.0F, 12.0F, 7.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 17.0F, 1.0F));
-
-		PartDefinition tail = penguin.addOrReplaceChild("tail", CubeListBuilder.create().texOffs(27, 0).addBox(-3.0F, 0.0F, 0.0F, 6.0F, 1.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(0.0F, 4.567F, 3.616F, -0.6109F, 0.0F, 0.0F));
-
-		PartDefinition fin_right = penguin.addOrReplaceChild("fin_right", CubeListBuilder.create().texOffs(23, 26).addBox(0.0F, 0.0F, -2.5F, 1.0F, 9.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offset(5.0F, -4.933F, 0.116F));
-
-		PartDefinition fin_left = penguin.addOrReplaceChild("fin_left", CubeListBuilder.create().texOffs(23, 26).mirror().addBox(-1.0F, 0.0F, -2.5F, 1.0F, 9.0F, 5.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(-5.0F, -4.933F, 0.116F));
-
-		PartDefinition feet_right = penguin.addOrReplaceChild("feet_right", CubeListBuilder.create().texOffs(22, 19).mirror().addBox(-1.25F, 0.0F, -4.0F, 3.0F, 1.0F, 5.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(2.25F, 6.067F, 1.616F));
-
-		PartDefinition feet_left = penguin.addOrReplaceChild("feet_left", CubeListBuilder.create().texOffs(22, 19).addBox(-1.75F, 0.0F, -4.0F, 3.0F, 1.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.25F, 6.067F, 1.616F));
-
-		PartDefinition head = penguin.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 19).addBox(-4.0F, -6.0F, -3.0F, 8.0F, 6.0F, 6.0F, new CubeDeformation(0.0F))
-		.texOffs(0, 0).addBox(-1.0F, -3.0F, -6.0F, 2.0F, 3.0F, 1.0F, new CubeDeformation(0.0F))
-		.texOffs(27, 3).addBox(-1.0F, -3.0F, -5.0F, 2.0F, 2.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -5.933F, 0.116F));
-
-		PartDefinition eye_right = head.addOrReplaceChild("eye_right", CubeListBuilder.create().texOffs(2, 24).addBox(-1.0F, -0.5F, 0.0F, 2.0F, 1.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(2.0F, -3.5F, -3.02F));
-
-		PartDefinition pupil_right = eye_right.addOrReplaceChild("pupil_right", CubeListBuilder.create().texOffs(4, 23).addBox(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(-0.5F, 0.0F, -0.01F));
-
-		PartDefinition eye_left = head.addOrReplaceChild("eye_left", CubeListBuilder.create().texOffs(2, 24).addBox(-1.0F, -0.5F, 0.0F, 2.0F, 1.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.0F, -3.5F, -3.02F));
-
-		PartDefinition pupil_left = eye_left.addOrReplaceChild("pupil_left", CubeListBuilder.create().texOffs(4, 23).addBox(-0.5F, -0.5F, 0.0F, 1.0F, 1.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(0.5F, 0.0F, -0.01F));
-
-		PartDefinition eyebrown_left = head.addOrReplaceChild("eyebrown_left", CubeListBuilder.create().texOffs(0, 31).mirror().addBox(-2.5F, -2.5F, 0.0F, 4.0F, 3.0F, 5.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offset(-2.0F, -4.5F, -3.5F));
-
-		PartDefinition eyebrown_right = head.addOrReplaceChild("eyebrown_right", CubeListBuilder.create().texOffs(0, 31).addBox(-1.5F, -2.5F, 0.0F, 4.0F, 3.0F, 5.0F, new CubeDeformation(0.0F)), PartPose.offset(2.0F, -4.5F, -3.5F));
-
-		return LayerDefinition.create(meshdefinition, 64, 64);
+	@Override
+	public ResourceLocation getAnimationResource(T animatable) {
+		return ANIMATION_LOCATION;
 	}
 
 	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.root().getAllParts().forEach(ModelPart::resetPose);
-		this.animate(entity.fallAnimationState, PenguinAnimation.PENGUIN_FALLING, ageInTicks);
-		this.animate(entity.idleAnimationState, PenguinAnimation.PENGUIN_IDLE, ageInTicks);
-		this.animate(entity.leapAnimationState, PenguinAnimation.PENGUIN_JUMPING_INTO_THE_LAND, ageInTicks);
-		this.animate(entity.swimAnimationState, PenguinAnimation.PENGUIN_SWIMMING, ageInTicks);
-		this.animate(entity.walkAnimationState, PenguinAnimation.PENGUIN_WALK, ageInTicks);
+	public ResourceLocation getModelResource(T object) {
+		return MODEL_LOCATION;
 	}
 
 	@Override
-	public ModelPart root() {
-		return this.root;
+	public ResourceLocation getTextureResource(T object) {
+		return TEXTURE_LOCATION;
+	}
+
+	@Override
+	public void setCustomAnimations(T animatable, int instanceId, AnimationEvent animationEvent) {
+		super.setCustomAnimations(animatable, instanceId, animationEvent);
+		IBone head = this.getAnimationProcessor().getBone("head");
+
+		EntityModelData extraData = (EntityModelData) animationEvent.getExtraDataOfType(EntityModelData.class).get(0);
+		if (extraData.headPitch != 0 || extraData.netHeadYaw != 0) {
+			head.setRotationX(head.getRotationX() + (extraData.headPitch * ((float) Math.PI / 180F)));
+			head.setRotationY(head.getRotationY() + (extraData.netHeadYaw * ((float) Math.PI / 180F)));
+
+			if(animatable.isInWater()){
+				List<IBone> modelRendererList = this.getAnimationProcessor().getModelRendererList();
+				for(IBone bone : modelRendererList){
+					if(bone != head) bone.setRotationX(bone.getRotationX() + (extraData.headPitch * ((float) Math.PI / 180F)));
+				}
+			}
+		}
 	}
 }

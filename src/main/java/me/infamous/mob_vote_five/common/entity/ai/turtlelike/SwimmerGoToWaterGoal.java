@@ -19,12 +19,12 @@ public class SwimmerGoToWaterGoal<T extends PathfinderMob & Swimmer> extends Mov
 
     @Override
     public boolean canContinueToUse() {
-        return this.turtle.wantsToSwim() && !this.turtle.isInWater() && this.tryTicks <= GIVE_UP_TICKS && this.isValidTarget(this.turtle.level, this.blockPos);
+        return !this.turtle.isInWater() && this.tryTicks <= GIVE_UP_TICKS && this.isValidTarget(this.turtle.level, this.blockPos);
     }
 
     @Override
     public boolean canUse() {
-        return this.turtle.wantsToSwim() && !this.turtle.isInWater() && super.canUse();
+        return this.turtle.wantsToFindWater() && !this.turtle.isInWater() && super.canUse();
     }
 
     @Override

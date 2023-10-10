@@ -33,13 +33,13 @@ public class SwimWithPlayerGoal<T extends Mob & Swimmer> extends Goal {
         if (this.player == null) {
             return false;
         } else {
-            return this.player.isSwimming() && this.swimmer.getTarget() != this.player;
+            return this.swimmer.canSwimWithPlayer(this.player) && this.swimmer.getTarget() != this.player;
         }
     }
 
     @Override
     public boolean canContinueToUse() {
-        return this.player != null && this.player.isSwimming() && this.swimmer.closerThan(this.player, this.tooFar);
+        return this.player != null && this.swimmer.canSwimWithPlayer(this.player) && this.swimmer.closerThan(this.player, this.tooFar);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class SwimWithPlayerGoal<T extends Mob & Swimmer> extends Goal {
             this.swimmer.getNavigation().moveTo(this.player, this.speedModifier);
         }
 
-        if (this.player.isSwimming() && this.player.level.random.nextInt(6) == 0) {
+        if (this.swimmer.canSwimWithPlayer(this.player)) {
             this.swimmer.tickSwimmingWithPlayer(this.player);
         }
     }

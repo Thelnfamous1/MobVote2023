@@ -72,7 +72,7 @@ public class TravelGoal<T extends PathfinderMob & Traveller> extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return !this.turtle.getNavigation().isDone() && !this.stuck && this.turtle.wantsToTravel();
+        return !this.turtle.getNavigation().isDone() && !this.stuck && this.turtle.canContinueTravelling();
     }
 
     @Override

@@ -24,13 +24,24 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.builder.ILoopType;
+import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
+import software.bernie.geckolib3.core.manager.AnimationData;
+import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
-public class Crab extends Animal implements Greeter {
+public class Crab extends Animal implements IAnimatable, Greeter {
     private static final EntityDataAccessor<Boolean> DATA_GREETING = SynchedEntityData.defineId(Crab.class, EntityDataSerializers.BOOLEAN);
     private static final Ingredient FOOD_ITEMS = Ingredient.of(MVTags.CRAB_FOOD);
-    public final AnimationState greetAnimationState = new AnimationState();
-    public final AnimationState idleAnimationState = new AnimationState();
-    public final AnimationState walkAnimationState = new AnimationState();
+    protected static final AnimationBuilder GREET_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.crab.greeting", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder IDLE_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.crab.idle", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder WALK_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.crab.walk", ILoopType.EDefaultLoopTypes.LOOP);
+
+    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public Crab(EntityType<? extends Crab> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -73,36 +84,8 @@ public class Crab extends Animal implements Greeter {
         return pStack.is(MVTags.CRAB_FOOD);
     }
 
-    @Override
-    public void tick() {
-        if (this.level.isClientSide()) {
-            if (this.isMoving()) {
-                this.idleAnimationState.stop();
-                this.walkAnimationState.startIfStopped(this.tickCount);
-            } else {
-                this.walkAnimationState.stop();
-                this.idleAnimationState.startIfStopped(this.tickCount);
-            }
-        }
-
-        super.tick();
-    }
-
     private boolean isMoving() {
         return this.getDeltaMovement().horizontalDistanceSqr() > 1.0E-6D;
-    }
-
-    @Override
-    public void onSyncedDataUpdated(EntityDataAccessor<?> pKey) {
-        if (DATA_GREETING.equals(pKey)) {
-            if (this.isGreeting()) {
-                this.greetAnimationState.start(this.tickCount);
-            } else {
-                this.greetAnimationState.stop();
-            }
-        }
-
-        super.onSyncedDataUpdated(pKey);
     }
 
     @Override
@@ -153,5 +136,26 @@ public class Crab extends Animal implements Greeter {
     @Override
     public AgeableMob getBreedOffspring(ServerLevel pLevel, AgeableMob pOtherParent) {
         return MVEntityTypes.CRAB.get().create(pLevel);
+    }
+
+    @Override
+    public void registerControllers(AnimationData data) {
+        data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    private <T extends IAnimatable> PlayState predicate(AnimationEvent<T> event) {
+        if(this.isGreeting()){
+            event.getController().setAnimation(GREET_ANIMATION_STATE);
+        } else if(event.isMoving()){
+            event.getController().setAnimation(WALK_ANIMATION_STATE);
+        } else{
+            event.getController().setAnimation(IDLE_ANIMATION_STATE);
+        }
+        return PlayState.CONTINUE;
+    }
+
+    @Override
+    public AnimationFactory getFactory() {
+        return this.animationFactory;
     }
 }

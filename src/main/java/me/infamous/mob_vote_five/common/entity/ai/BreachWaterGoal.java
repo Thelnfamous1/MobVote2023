@@ -10,13 +10,13 @@ import net.minecraft.world.entity.ai.goal.JumpGoal;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 
-public class SwimmingJumpGoal<T extends Mob & Swimmer> extends JumpGoal {
+public class BreachWaterGoal<T extends Mob & Swimmer> extends JumpGoal {
    private static final int[] STEPS_TO_CHECK = new int[]{0, 1, 4, 5, 6, 7};
    private final T swimmer;
    private final int interval;
    private boolean breached;
 
-   public SwimmingJumpGoal(T swimmer, int pInterval) {
+   public BreachWaterGoal(T swimmer, int pInterval) {
       this.swimmer = swimmer;
       this.interval = reducedTickDelay(pInterval);
    }

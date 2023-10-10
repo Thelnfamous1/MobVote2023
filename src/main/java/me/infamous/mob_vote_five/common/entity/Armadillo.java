@@ -17,15 +17,26 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.builder.ILoopType;
+import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
+import software.bernie.geckolib3.core.manager.AnimationData;
+import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
-public class Armadillo extends Animal implements Roller{
+public class Armadillo extends Animal implements IAnimatable, Roller{
     private static final EntityDataAccessor<Boolean> DATA_ROLLING = SynchedEntityData.defineId(Armadillo.class, EntityDataSerializers.BOOLEAN);
-    public final AnimationState revealAnimationState = new AnimationState();
-    public final AnimationState hideAnimationState = new AnimationState();
-    public final AnimationState hiddenAnimationState = new AnimationState();
-    public final AnimationState idleAnimationState = new AnimationState();
-    public final AnimationState rollAnimationState = new AnimationState();
-    public final AnimationState walkAnimationState = new AnimationState();
+    protected static final AnimationBuilder APPEAR_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.appear", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder HIDE_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.hide", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder HIDDEN_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.hide_idle", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder IDLE_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.idle", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder ROLL_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.roll", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder WALK_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.walk", ILoopType.EDefaultLoopTypes.LOOP);
+
+    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
 
     public Armadillo(EntityType<? extends Armadillo> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -46,36 +57,8 @@ public class Armadillo extends Animal implements Roller{
     }
 
     @Override
-    public void onSyncedDataUpdated(EntityDataAccessor<?> pKey) {
-        if (DATA_ROLLING.equals(pKey)) {
-            if (this.isRolling()) {
-                this.rollAnimationState.start(this.tickCount);
-            } else {
-                this.rollAnimationState.stop();
-            }
-        }
-
-        super.onSyncedDataUpdated(pKey);
-    }
-
-    @Override
     public boolean canBeLeashed(Player pPlayer) {
         return false;
-    }
-
-    @Override
-    public void tick() {
-        if (this.level.isClientSide()) {
-            if (this.isMoving()) {
-                this.idleAnimationState.stop();
-                this.walkAnimationState.startIfStopped(this.tickCount);
-            } else {
-                this.walkAnimationState.stop();
-                this.idleAnimationState.startIfStopped(this.tickCount);
-            }
-        }
-
-        super.tick();
     }
 
     private boolean isMoving() {
@@ -101,5 +84,27 @@ public class Armadillo extends Animal implements Roller{
     @Override
     public void setRolling(boolean rolling) {
         this.entityData.set(DATA_ROLLING, rolling);
+    }
+
+
+    @Override
+    public void registerControllers(AnimationData data) {
+        data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    private <T extends IAnimatable> PlayState predicate(AnimationEvent<T> event) {
+        if(this.isRolling()){
+            event.getController().setAnimation(ROLL_ANIMATION_STATE);
+        } else if(event.isMoving()){
+            event.getController().setAnimation(WALK_ANIMATION_STATE);
+        } else{
+            event.getController().setAnimation(IDLE_ANIMATION_STATE);
+        }
+        return PlayState.CONTINUE;
+    }
+
+    @Override
+    public AnimationFactory getFactory() {
+        return this.animationFactory;
     }
 }

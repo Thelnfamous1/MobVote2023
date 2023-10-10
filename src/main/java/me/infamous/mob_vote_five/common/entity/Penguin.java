@@ -3,7 +3,7 @@ package me.infamous.mob_vote_five.common.entity;
 import me.infamous.mob_vote_five.common.datagen.MVTags;
 import me.infamous.mob_vote_five.common.entity.ai.AmphibiousMoveControl;
 import me.infamous.mob_vote_five.common.entity.ai.SwimWithPlayerGoal;
-import me.infamous.mob_vote_five.common.entity.ai.SwimmingJumpGoal;
+import me.infamous.mob_vote_five.common.entity.ai.BreachWaterGoal;
 import me.infamous.mob_vote_five.common.entity.ai.turtlelike.*;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
 import net.minecraft.core.BlockPos;
@@ -29,6 +29,7 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.Guardian;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.*;
@@ -37,8 +38,17 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import software.bernie.geckolib3.core.IAnimatable;
+import software.bernie.geckolib3.core.PlayState;
+import software.bernie.geckolib3.core.builder.AnimationBuilder;
+import software.bernie.geckolib3.core.builder.ILoopType;
+import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
+import software.bernie.geckolib3.core.manager.AnimationData;
+import software.bernie.geckolib3.core.manager.AnimationFactory;
+import software.bernie.geckolib3.util.GeckoLibUtil;
 
-public class Penguin extends Animal implements Swimmer, HasHome, Traveller, LaysEggs {
+public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Traveller, LaysEggs {
     private static final boolean ENABLE_EGG_LAYING = true; // debug switch for egg laying behavior
     private static final EntityDataAccessor<BlockPos> HOME_POS = SynchedEntityData.defineId(Penguin.class, EntityDataSerializers.BLOCK_POS);
     private static final EntityDataAccessor<Boolean> HAS_EGG = SynchedEntityData.defineId(Penguin.class, EntityDataSerializers.BOOLEAN);
@@ -48,19 +58,21 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
     private static final EntityDataAccessor<Boolean> TRAVELLING = SynchedEntityData.defineId(Penguin.class, EntityDataSerializers.BOOLEAN);
     protected static final TargetingConditions SWIM_WITH_PLAYER_TARGETING = TargetingConditions.forNonCombat().range(10.0D).ignoreLineOfSight();
     private static final Ingredient FOOD_ITEMS = Ingredient.of(MVTags.PENGUIN_FOOD);
-    public final AnimationState fallAnimationState = new AnimationState();
-    public final AnimationState idleAnimationState = new AnimationState();
-    public final AnimationState leapAnimationState = new AnimationState();
-    public final AnimationState swimAnimationState = new AnimationState();
-    public final AnimationState walkAnimationState = new AnimationState();
+    protected static final AnimationBuilder FALL_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.penguin.falling", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder IDLE_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.penguin.idle", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder LEAP_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.penguin.jumping_into_the_land", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder PUSH_BOAT_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.penguin.push_boat", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder SWIM_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.penguin.swimming", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder WALK_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.penguin.walk", ILoopType.EDefaultLoopTypes.LOOP);
+    private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
     private int layEggCounter;
 
     public Penguin(EntityType<? extends Penguin> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.setPathfindingMalus(BlockPathTypes.WATER, 0.0F);
-        // dolphins have a move speed of 1.2 that gets mulitplied by 0.02 when swimming for a final speed of 0.024
+        // dolphins have a move speed of 1.2 that gets multiplied by 0.02 when swimming for a final speed of 0.024
         // to replicate that speed without making the walking speed absurd, we use a move speed of 0.15 that gets multiplied by 0.16 for a final speed of 0.024
-        this.moveControl = new AmphibiousMoveControl(this, 85, 10, 0.16F, true);
+        this.moveControl = new AmphibiousMoveControl(this, 85, 10, 0.16F, 1.0F, true);
         this.maxUpStep = 1.0F;
     }
 
@@ -89,11 +101,6 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
     }
 
     @Override
-    public void onSyncedDataUpdated(EntityDataAccessor<?> pKey) {
-        super.onSyncedDataUpdated(pKey);
-    }
-
-    @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new BreathAirGoal(this)); // dolphin
         //this.goalSelector.addGoal(0, new TryFindWaterGoal(this)); // dolphin
@@ -108,7 +115,7 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
         //this.goalSelector.addGoal(4, new RandomSwimmingGoal(this, 1.0D, 10)); // dolphin
         //this.goalSelector.addGoal(4, new RandomLookAroundGoal(this)); // dolphin
         //this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 6.0F)); // dolphin
-        this.goalSelector.addGoal(5, new SwimmingJumpGoal<>(this, 10)); // dolphin
+        this.goalSelector.addGoal(5, new BreachWaterGoal<>(this, 10)); // dolphin
         this.goalSelector.addGoal(6, new MeleeAttackGoal(this, 1.2D, true)); // dolphin
         this.goalSelector.addGoal(7, new TravelGoal<>(this, 1.0D, 512, 4)); // turtle
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F)); // turtle
@@ -122,7 +129,7 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
 
     private void addBreedGoal() {
         if(ENABLE_EGG_LAYING){
-            this.goalSelector.addGoal(1, new LayEggGoal<>(this, 1.0D)); // turtle, disabling for now
+            this.goalSelector.addGoal(1, new LayEggGoal<>(this, 1.0D, 16, 9.0D)); // turtle, disabling for now
         } else{
             this.goalSelector.addGoal(1, new BreedGoal(this, 1.0D));
         }
@@ -181,16 +188,20 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
     }
 
     public static boolean onSpawnBlock(BlockPos pPos, LevelReader pLevel) {
-        return pLevel.getBlockState(pPos.below()).is(MVTags.PENGUINS_SPAWNABLE_ON);
+        return isSpawnBlock(pPos.below(), pLevel);
+    }
+
+    public static boolean isSpawnBlock(BlockPos pPos, LevelReader pLevel) {
+        return pLevel.getBlockState(pPos).is(MVTags.PENGUINS_SPAWNABLE_ON);
     }
 
     @Override
     public void aiStep() {
         super.aiStep();
         if (this.isAlive() && this.isLayingEgg() && this.layEggCounter >= 1 && this.layEggCounter % 5 == 0) {
-            BlockPos blockpos = this.blockPosition();
-            if (onSpawnBlock(blockpos, this.level)) {
-                this.level.levelEvent(2001, blockpos, Block.getId(this.level.getBlockState(blockpos.below())));
+            BlockPos blockPos = this.blockPosition();
+            if (onSpawnBlock(blockPos, this.level)) {
+                this.level.levelEvent(2001, blockPos, Block.getId(this.level.getBlockState(blockPos.below())));
             }
         }
     }
@@ -198,7 +209,7 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
     @Override
     public void travel(Vec3 pTravelVector) {
         if (this.isEffectiveAi() && this.isInWater()) {
-            this.moveRelative(this.getSpeed(), pTravelVector);
+            this.moveRelative(0.1F, pTravelVector);
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().scale(0.9D));
             if (this.getTarget() == null && (!this.isGoingHome() || !this.getHomePos().closerToCenterThan(this.position(), 20.0D))) {
@@ -253,33 +264,7 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
     }
 
     @Override
-    protected float nextStep() {
-        return this.moveDist + 0.15F;
-    }
-
-    @Override
-    public float getScale() {
-        return this.isBaby() ? 0.3F : 1.0F;
-    }
-
-    @Override
     public void tick() {
-        if (this.level.isClientSide()) {
-            if (this.isMovingOnLand()) {
-                this.idleAnimationState.stop();
-                this.walkAnimationState.startIfStopped(this.tickCount);
-            } else {
-                this.walkAnimationState.stop();
-                this.idleAnimationState.startIfStopped(this.tickCount);
-            }
-
-            if (this.isInWaterOrBubble() || this.isBreaching()) {
-                this.swimAnimationState.startIfStopped(this.tickCount);
-            } else {
-                this.swimAnimationState.stop();
-            }
-        }
-
         super.tick();
         if (this.isNoAi()) {
             this.setAirSupply(this.getMaxAirSupply());
@@ -322,7 +307,7 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
 
     @Nullable
     @Override
-    public AgeableMob getBreedOffspring(ServerLevel pLevel, AgeableMob pOtherParent) {
+    public Penguin getBreedOffspring(ServerLevel pLevel, AgeableMob pOtherParent) {
         return MVEntityTypes.PENGUIN.get().create(pLevel);
     }
 
@@ -357,11 +342,16 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
     }
 
     @Override
-    public boolean wantsToSwim() {
+    public boolean wantsToFindWater() {
         if(this.isBaby()){
             return false;
         }
-        return !this.hasEgg() && this.isGoingHome() && this.level.isDay();
+        return !this.isGoingHome() && !this.hasEgg();
+    }
+
+    @Override
+    public boolean canSwimWithPlayer(Player player) {
+        return player.getVehicle() instanceof Boat;
     }
 
     @Override
@@ -406,21 +396,22 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
 
     @Override
     public void layEgg(ServerLevel level, BlockPos layPos) {
-        AgeableMob breedOffspring = this.getBreedOffspring(level, null);
+        Penguin breedOffspring = this.getBreedOffspring(level, null);
         if (breedOffspring != null) {
+            breedOffspring.onHatched(layPos);
             breedOffspring.setBaby(true);
-            breedOffspring.moveTo(layPos.above(), 0.0F, 0.0F);
+            breedOffspring.moveTo(layPos, 0.0F, 0.0F);
             level.addFreshEntityWithPassengers(breedOffspring);
         }
         /*
         this.level.playSound(null, this.blockPosition(), SoundEvents.TURTLE_LAY_EGG, SoundSource.BLOCKS, 0.3F, 0.9F + this.level.random.nextFloat() * 0.2F);
-        this.level.setBlock(layPos.above(), Blocks.TURTLE_EGG.defaultBlockState().setValue(TurtleEggBlock.EGGS, this.random.nextInt(4) + 1), 3);
+        this.level.setBlock(layPos, Blocks.TURTLE_EGG.defaultBlockState().setValue(TurtleEggBlock.EGGS, this.random.nextInt(4) + 1), 3);
          */
     }
 
     @Override
     public boolean canLayEggsOn(BlockPos targetPos, LevelReader level) {
-        return onSpawnBlock(targetPos, level);
+        return isSpawnBlock(targetPos, level);
     }
 
     @Override
@@ -446,7 +437,7 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
     @Override
     public boolean wantsToGoHome() {
         if (this.isBaby()) {
-            return false;
+            return true;
         } else if (this.hasEgg()) {
             return true;
         } else if (this.random.nextInt(350) != 0) {
@@ -478,11 +469,37 @@ public class Penguin extends Animal implements Swimmer, HasHome, Traveller, Lays
 
     @Override
     public boolean wantsToTravel() {
-        return this.isInWater() && !this.isGoingHome() && !this.isInLove() && !this.hasEgg();
+        return !this.isGoingHome() && !this.hasEgg() && this.isInWater();
+    }
+
+    @Override
+    public boolean canContinueTravelling() {
+        return !this.isGoingHome() && !this.isInLove() && !this.hasEgg();
     }
 
     @Override
     public boolean wantsToStroll() {
         return !this.isInWater() && !this.isGoingHome() && !this.hasEgg();
+    }
+
+    @Override
+    public void registerControllers(AnimationData data) {
+        data.addAnimationController(new AnimationController<>(this, "controller", 0, this::predicate));
+    }
+
+    private <T extends IAnimatable> PlayState predicate(AnimationEvent<T> event) {
+        if(this.isInWater() || this.isBreaching()){
+            event.getController().setAnimation(SWIM_ANIMATION_STATE);
+        } else if(event.isMoving()){
+            event.getController().setAnimation(WALK_ANIMATION_STATE);
+        } else{
+            event.getController().setAnimation(IDLE_ANIMATION_STATE);
+        }
+        return PlayState.CONTINUE;
+    }
+
+    @Override
+    public AnimationFactory getFactory() {
+        return this.animationFactory;
     }
 }

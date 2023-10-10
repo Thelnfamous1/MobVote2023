@@ -4,9 +4,6 @@ import me.infamous.mob_vote_five.MobVote2023;
 import me.infamous.mob_vote_five.client.renderer.ArmadilloRenderer;
 import me.infamous.mob_vote_five.client.renderer.CrabRenderer;
 import me.infamous.mob_vote_five.client.renderer.PenguinRenderer;
-import me.infamous.mob_vote_five.client.renderer.model.ArmadilloModel;
-import me.infamous.mob_vote_five.client.renderer.model.CrabModel;
-import me.infamous.mob_vote_five.client.renderer.model.PenguinModel;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
@@ -23,10 +20,12 @@ public class ModClientEventHandlers {
         event.registerEntityRenderer(MVEntityTypes.PENGUIN.get(), PenguinRenderer::new);
     }
 
+    /*
     @SubscribeEvent
     static void onRenderRegistry(EntityRenderersEvent.RegisterLayerDefinitions event){
         event.registerLayerDefinition(MVModelLayers.ARMADILLO, ArmadilloModel::createBodyLayer);
         event.registerLayerDefinition(MVModelLayers.CRAB, CrabModel::createBodyLayer);
         event.registerLayerDefinition(MVModelLayers.PENGUIN, PenguinModel::createBodyLayer);
     }
+     */
 }

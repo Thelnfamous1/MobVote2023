@@ -106,13 +106,13 @@ public class HatchableEggBlock<T extends AgeableMob & LaysEggs> extends TurtleEg
                 pLevel.playSound(null, pPos, SoundEvents.TURTLE_EGG_HATCH, SoundSource.BLOCKS, 0.7F, 0.9F + pRandom.nextFloat() * 0.2F);
                 pLevel.removeBlock(pPos, false);
 
-                for(int j = 0; j < pState.getValue(EGGS); ++j) {
+                for(int egg = 0; egg < pState.getValue(EGGS); ++egg) {
                     pLevel.levelEvent(2001, pPos, Block.getId(pState));
                     T baby = this.typeSupplier.get().create(pLevel);
                     baby.onHatched(pPos);
                     baby.setAge(AgeableMob.BABY_START_AGE);
 
-                    baby.moveTo((double)pPos.getX() + 0.3D + (double)j * 0.2D, pPos.getY(), (double)pPos.getZ() + 0.3D, 0.0F, 0.0F);
+                    baby.moveTo((double)pPos.getX() + 0.3D + (double)egg * 0.2D, pPos.getY(), (double)pPos.getZ() + 0.3D, 0.0F, 0.0F);
                     pLevel.addFreshEntity(baby);
                 }
             }
