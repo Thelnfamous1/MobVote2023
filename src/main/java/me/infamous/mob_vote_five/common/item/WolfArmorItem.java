@@ -26,7 +26,7 @@ public class WolfArmorItem extends Item {
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public WolfArmorItem(int pProtection, String pIdentifier, Item.Properties pProperties) {
-        this(pProtection, new ResourceLocation(MobVote2023.MODID, "textures/entity/armor/wolf_armor" + pIdentifier + ".png"), pProperties);
+        this(pProtection, new ResourceLocation(MobVote2023.MODID, "textures/entity/armor/wolf_armor" + (!pIdentifier.isEmpty() ? "/" : "") + pIdentifier + ".png"), pProperties);
     }
     public WolfArmorItem(int pProtection, ResourceLocation pIdentifier, Item.Properties pProperties) {
         super(pProperties);
