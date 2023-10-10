@@ -1,6 +1,7 @@
 package me.infamous.mob_vote_five;
 
 import com.mojang.logging.LogUtils;
+import me.infamous.mob_vote_five.common.registry.MVDataSerializers;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
 import me.infamous.mob_vote_five.common.registry.MVItems;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -17,5 +18,6 @@ public class MobVote2023 {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         MVEntityTypes.register(modEventBus);
         MVItems.register(modEventBus);
+        MVDataSerializers.register(modEventBus);
     }
 }
