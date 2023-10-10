@@ -48,8 +48,8 @@ public class Armadillo extends Animal implements IAnimatable, Hider{
     private static final AttributeModifier COVERED_ARMOR_MODIFIER = new AttributeModifier(COVERED_ARMOR_MODIFIER_UUID, "Covered armor bonus", 20.0D, AttributeModifier.Operation.ADDITION);
     private static final Ingredient FOOD_ITEMS = Ingredient.of(MVTags.ARMADILLO_FOOD);
     private static final EntityDataAccessor<Hider.HideState> DATA_HIDE_STATE = SynchedEntityData.defineId(Armadillo.class, MVDataSerializers.DIG_STATE.get());
-    protected static final AnimationBuilder APPEAR_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.appear", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
-    protected static final AnimationBuilder HIDE_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.hide", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder APPEAR_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.appear", ILoopType.EDefaultLoopTypes.HOLD_ON_LAST_FRAME);
+    protected static final AnimationBuilder HIDE_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.hide", ILoopType.EDefaultLoopTypes.HOLD_ON_LAST_FRAME);
     protected static final AnimationBuilder HIDDEN_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.hide_idle", ILoopType.EDefaultLoopTypes.LOOP);
     protected static final AnimationBuilder IDLE_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.idle", ILoopType.EDefaultLoopTypes.LOOP);
     protected static final AnimationBuilder ROLL_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.roll", ILoopType.EDefaultLoopTypes.LOOP);
