@@ -133,6 +133,7 @@ public class DataGenHandler {
                 this.tag(MVTags.CRAB_FOOD).add(Blocks.SEAGRASS.asItem());
                 this.tag(MVTags.PENGUIN_FOOD).addTag(ItemTags.FISHES);
                 this.tag(MVTags.ARMADILLO_FOOD).add(Items.SPIDER_EYE);
+                this.tag(MVTags.PREVENTS_ARMADILLO_REVEAL).add(Items.LEATHER_BOOTS, Items.LEATHER_CHESTPLATE, Items.LEATHER_HELMET, Items.LEATHER_LEGGINGS);
             }
         });
 

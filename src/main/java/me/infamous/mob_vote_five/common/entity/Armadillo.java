@@ -42,8 +42,13 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.UUID;
+import java.util.function.Predicate;
 
 public class Armadillo extends Animal implements IAnimatable, Hider{
+
+    public static final Predicate<Entity> REVEAL_PREDICATE = (target) -> {
+        return !(target instanceof Player player) || !player.isSpectator() && !player.isCreative() && !isWearingLeather(player);
+    };
     private static final UUID COVERED_ARMOR_MODIFIER_UUID = UUID.fromString("2b0a0d7f-c097-4de0-ad8b-1079ede7e85c");
     private static final AttributeModifier COVERED_ARMOR_MODIFIER = new AttributeModifier(COVERED_ARMOR_MODIFIER_UUID, "Covered armor bonus", 20.0D, AttributeModifier.Operation.ADDITION);
     private static final Ingredient FOOD_ITEMS = Ingredient.of(MVTags.ARMADILLO_FOOD);
@@ -65,6 +70,16 @@ public class Armadillo extends Animal implements IAnimatable, Hider{
 
     public static AttributeSupplier.Builder createAttributes() {
         return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 10.0D).add(Attributes.MOVEMENT_SPEED, 0.25D);
+    }
+
+    public static boolean isWearingLeather(LivingEntity pLivingEntity) {
+        for(ItemStack armorStack : pLivingEntity.getArmorSlots()) {
+            if (armorStack.is(MVTags.PREVENTS_ARMADILLO_REVEAL)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static boolean checkArmadilloSpawnRules(EntityType<Armadillo> type, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
@@ -219,7 +234,6 @@ public class Armadillo extends Animal implements IAnimatable, Hider{
 
     @Override
     public boolean wantsToReveal() {
-        // the boolean argument makes it so creative players are ignored for the search
-        return this.level.getNearestPlayer(this.getX(), this.getY(), this.getZ(), 8, true) != null;
+        return this.level.getNearestPlayer(this.getX(), this.getY(), this.getZ(), 8, REVEAL_PREDICATE) != null;
     }
 }

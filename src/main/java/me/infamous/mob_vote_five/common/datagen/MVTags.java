@@ -18,6 +18,7 @@ public class MVTags {
     public static final TagKey<Block> CRABS_SPAWNABLE_ON = createBlocks("crabs_spawnable_on");
     public static final TagKey<EntityType<?>> PENGUIN_EGG_IGNORES_FALLING = createEntityTypes("penguin_egg_ignores_falling");
     public static final TagKey<EntityType<?>> PENGUIN_EGG_IGNORES = createEntityTypes("penguin_egg_ignores");
+    public static final TagKey<Item> PREVENTS_ARMADILLO_REVEAL = createItems("prevents_armadillo_reveal");
 
     private static TagKey<Block> createBlocks(String pName) {
         return TagKey.create(Registry.BLOCK_REGISTRY, new ResourceLocation(MobVote2023.MODID, pName));
