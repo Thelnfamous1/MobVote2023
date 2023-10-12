@@ -5,6 +5,7 @@ import com.mojang.datafixers.util.Pair;
 import me.infamous.mob_vote_five.MobVote2023;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
 import me.infamous.mob_vote_five.common.registry.MVItems;
+import me.infamous.mob_vote_five.common.registry.MVMobEffects;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.loot.EntityLoot;
 import net.minecraft.data.loot.LootTableProvider;
@@ -70,6 +71,7 @@ public class DataGenHandler {
                 this.add(MVItems.ARMADILLO_SCUTE.get(), "Armadillo Scute");
                 this.add(MVItems.CRAB_CLAW.get(), "Crab Claw");
                 this.add(MVItems.WOLF_ARMOR.get(), "Wolf Armor");
+                this.add(MVMobEffects.PENGUINS_GRACE.get(), "Penguin's Grace");
             }
         });
 

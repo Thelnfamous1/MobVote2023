@@ -21,5 +21,5 @@ public interface Swimmer {
 
     boolean wantsToFindWater();
 
-    boolean canSwimWithPlayer(Player player);
+    boolean wantsToSwimAway();
 }
