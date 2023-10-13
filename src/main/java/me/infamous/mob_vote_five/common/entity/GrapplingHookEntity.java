@@ -1,6 +1,7 @@
 package me.infamous.mob_vote_five.common.entity;
 
 import me.infamous.mob_vote_five.common.duck.Grappler;
+import me.infamous.mob_vote_five.common.item.GrapplingHookItem;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
 import me.infamous.mob_vote_five.common.registry.MVItems;
 import me.infamous.mob_vote_five.mixin.ProjectileAccessor;
@@ -70,6 +71,19 @@ public class GrapplingHookEntity extends AbstractArrow implements IAnimatable, I
         super.defineSynchedData();
         this.entityData.define(DATA_OWNER_UUID, Optional.empty());
         this.entityData.define(DATA_OWNERID_ID, 0);
+    }
+
+    @Override
+    public void playerTouch(Player pEntity) {
+        if (!this.level.isClientSide && (this.inGround || this.isNoPhysics()) && this.shakeTime <= 0) {
+            if (this.tryPickup(pEntity)) {
+                if(pEntity.getUseItem().getItem() instanceof GrapplingHookItem) pEntity.stopUsingItem();
+                pEntity.take(this, 1);
+                this.discard();
+            }
+
+        }
+
     }
 
     @Override

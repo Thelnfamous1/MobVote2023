@@ -17,9 +17,9 @@ public class MVItems {
 
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MobVote2023.MODID);
 
-    public static final RegistryObject<Item> CRAB_SPAWN_EGG = registerSpawnEgg("turtle_spawn_egg", MVEntityTypes.CRAB, 15198183, 44975);
-    public static final RegistryObject<Item> ARMADILLO_SPAWN_EGG = registerSpawnEgg("armadillo_spawn_egg", MVEntityTypes.ARMADILLO, 15198183, 44975);
-    public static final RegistryObject<Item> PENGUIN_SPAWN_EGG = registerSpawnEgg("penguin_spawn_egg", MVEntityTypes.PENGUIN, 15198183, 44975);
+    public static final RegistryObject<Item> CRAB_SPAWN_EGG = registerSpawnEgg("crab_spawn_egg", MVEntityTypes.CRAB, 0x384186, 0xef731d);
+    public static final RegistryObject<Item> ARMADILLO_SPAWN_EGG = registerSpawnEgg("armadillo_spawn_egg", MVEntityTypes.ARMADILLO, 0x925631, 0x784530);
+    public static final RegistryObject<Item> PENGUIN_SPAWN_EGG = registerSpawnEgg("penguin_spawn_egg", MVEntityTypes.PENGUIN, 0x332735, 0xdcd9c6);
 
     public static final RegistryObject<Item> ARMADILLO_SCUTE = ITEMS.register("armadillo_scute", () -> new Item((new Item.Properties()).tab(CreativeModeTab.TAB_MATERIALS)));
 

@@ -26,7 +26,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -40,7 +39,6 @@ import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.TemptGoal;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
-import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.Guardian;
 import net.minecraft.world.entity.player.Player;
@@ -85,10 +83,13 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
     public static final float IN_WATER_SPEED_MODIFIER = 0.16F;
     public static final float OUTSIDE_WATER_SPEED_MODIFIER = 1.0F;
     public static final double RESIST_SINK_YD = 0.005;
+    public static final float SWIMMING_FAST_SPEED_MODIFIER = 4.0F;
     private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
     private int layEggCounter;
     private boolean isLandNavigator;
     private Entity pushTarget;
+    private int rideTimeStamp;
+    private WiggleMotion wiggleMotion = WiggleMotion.CENTER_TO_LEFT;
 
     public Penguin(EntityType<? extends Penguin> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -155,7 +156,7 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
         this.goalSelector.addGoal(7, new TravelGoal<>(this, 1.0D, 512, 4)); // turtle
         this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F)); // turtle
         //this.goalSelector.addGoal(8, new Dolphin.PlayWithItemsGoal()); // dolphin
-        this.goalSelector.addGoal(8, new SwimWithBoatGoal<>(this, 4, 12, 1.0D)); // custom
+        this.goalSelector.addGoal(8, new SwimWithBoatGoal<>(this, 4, 12, SWIMMING_FAST_SPEED_MODIFIER)); // custom
         this.goalSelector.addGoal(9, new TravellerRandomStrollGoal<>(this, 1.0D, 100)); // turtle
         this.goalSelector.addGoal(9, new AvoidEntityGoal<>(this, Guardian.class, 8.0F, 1.0D, 1.0D)); // dolphin
 
@@ -231,15 +232,13 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
                 this.level.levelEvent(2001, blockPos, Block.getId(this.level.getBlockState(blockPos.below())));
             }
         }
-        if(!this.level.isClientSide && false){
-            if (this.getRandom().nextInt(25) == 0) {
-                Entity firstPassenger = this.getFirstPassenger();
-                if (firstPassenger == null) {
-                    return;
-                }
-
-                this.ejectPassengers();
+        if(!this.level.isClientSide && (this.tickCount > this.rideTimeStamp + 1200 || !this.isInWater() && !this.isBreaching())){
+            Entity firstPassenger = this.getFirstPassenger();
+            if (firstPassenger == null) {
+                return;
             }
+
+            this.ejectPassengers();
         }
     }
 
@@ -297,10 +296,11 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
 
         if(this.isBaby()){
             return super.mobInteract(pPlayer, pHand);
-        } else{
+        } else if(this.isInWater() && this.canAddPassenger(pPlayer)){
             this.doPlayerRide(pPlayer);
             return InteractionResult.sidedSuccess(this.level.isClientSide);
         }
+        return InteractionResult.PASS;
     }
 
     protected void doPlayerRide(Player pPlayer) {
@@ -308,6 +308,7 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
             pPlayer.setYRot(this.getYRot());
             pPlayer.setXRot(this.getXRot());
             pPlayer.startRiding(this);
+            this.rideTimeStamp = this.tickCount;
         }
     }
 
@@ -354,18 +355,16 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
 
     }
 
-    private float getMovementSpeed() {
+    public float getMovementSpeed() {
         return (float) this.getAttributeValue(Attributes.MOVEMENT_SPEED) * (this.isInWater() ?
                 IN_WATER_SPEED_MODIFIER : OUTSIDE_WATER_SPEED_MODIFIER);
     }
 
     public void doTravel(Vec3 pTravelVector, boolean playerControlled) {
         if ((playerControlled || this.isEffectiveAi()) && this.isInWater()) {
-            this.moveRelative(playerControlled ? this.getSpeed() : 0.1F, pTravelVector);
+            this.moveRelative(playerControlled ? this.getSpeed() * SWIMMING_FAST_SPEED_MODIFIER : 0.1F, pTravelVector);
             if(playerControlled) {
-                if(this.tickCount % 20 == 0){
-                    this.wiggle();
-                }
+                this.wiggle();
             }
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().scale(0.9D));
@@ -378,16 +377,25 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
     }
 
     private void wiggle() {
-        Vec3 randomPos = DefaultRandomPos.getPos(this, 5, 4); // taken from RunAroundLikeCrazyGoal
-        if(randomPos == null) randomPos = this.position();
+        if(this.tickCount % 20 == 0){
+            this.wiggleMotion = this.wiggleMotion.getNext();
+        }
+        Vec3 wiggleVec = new Vec3(this.wiggleMotion.getImpulse(), 0, 0).normalize();
+        this.moveRelative(this.getSpeed() * SWIMMING_FAST_SPEED_MODIFIER, wiggleVec);
+        /*
+        if(this.tickCount % 20 == 0){
+            Vec3 randomPos = DefaultRandomPos.getPos(this, 5, 4); // taken from RunAroundLikeCrazyGoal
+            if(randomPos == null) randomPos = this.position();
 
-        // taken from RamTarget
-        Vec3 wiggleDirection = (new Vec3((double)this.blockPosition().getX() - randomPos.x(), 0.0D, (double)this.blockPosition().getZ() - randomPos.z())).normalize();
-        int moveSpeedAmp = this.hasEffect(MobEffects.MOVEMENT_SPEED) ? this.getEffect(MobEffects.MOVEMENT_SPEED).getAmplifier() + 1 : 0;
-        int moveSlowdownAmp = this.hasEffect(MobEffects.MOVEMENT_SLOWDOWN) ? this.getEffect(MobEffects.MOVEMENT_SLOWDOWN).getAmplifier() + 1 : 0;
-        float moveAmp = 0.25F * (float)(moveSpeedAmp - moveSlowdownAmp);
-        float baseKnockback = Mth.clamp(this.getSpeed() * 1.65F, 0.2F, 3.0F) + moveAmp;
-        this.knockback(baseKnockback * 2.5F, wiggleDirection.x(), wiggleDirection.z());
+            // taken from RamTarget
+            Vec3 wiggleDirection = (new Vec3((double)this.blockPosition().getX() - randomPos.x(), 0.0D, (double)this.blockPosition().getZ() - randomPos.z())).normalize();
+            int moveSpeedAmp = this.hasEffect(MobEffects.MOVEMENT_SPEED) ? this.getEffect(MobEffects.MOVEMENT_SPEED).getAmplifier() + 1 : 0;
+            int moveSlowdownAmp = this.hasEffect(MobEffects.MOVEMENT_SLOWDOWN) ? this.getEffect(MobEffects.MOVEMENT_SLOWDOWN).getAmplifier() + 1 : 0;
+            float moveAmp = 0.25F * (float)(moveSpeedAmp - moveSlowdownAmp);
+            float baseKnockback = Mth.clamp(this.getSpeed() * 1.65F, 0.2F, 3.0F) + moveAmp;
+            this.knockback(baseKnockback * 2.5F, wiggleDirection.x(), wiggleDirection.z());
+        }
+         */
     }
 
     @Override
