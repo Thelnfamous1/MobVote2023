@@ -23,7 +23,7 @@ public class MVItems {
 
     public static final RegistryObject<Item> ARMADILLO_SCUTE = ITEMS.register("armadillo_scute", () -> new Item((new Item.Properties()).tab(CreativeModeTab.TAB_MATERIALS)));
 
-    public static final RegistryObject<Item> CRAB_CLAW = ITEMS.register("crab_claw", () -> new CrabClawItem((new Item.Properties().stacksTo(1)).tab(CreativeModeTab.TAB_TOOLS), 2.0F));
+    public static final RegistryObject<Item> CRAB_CLAW = ITEMS.register("crab_claw", () -> new CrabClawItem((new Item.Properties().durability(250)).tab(CreativeModeTab.TAB_TOOLS), 2.0F));
 
     public static final RegistryObject<Item> WOLF_ARMOR = ITEMS.register("wolf_armor", () -> new WolfArmorItem(3, "", (new Item.Properties()).stacksTo(1).tab(CreativeModeTab.TAB_MISC)));
 

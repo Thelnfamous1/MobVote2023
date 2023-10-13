@@ -1,10 +1,7 @@
 package me.infamous.mob_vote_five.client;
 
 import me.infamous.mob_vote_five.MobVote2023;
-import me.infamous.mob_vote_five.client.renderer.ArmadilloRenderer;
-import me.infamous.mob_vote_five.client.renderer.CrabRenderer;
-import me.infamous.mob_vote_five.client.renderer.PenguinRenderer;
-import me.infamous.mob_vote_five.client.renderer.WolfArmorLayer;
+import me.infamous.mob_vote_five.client.renderer.*;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
@@ -23,6 +20,7 @@ public class ModClientEventHandlers {
         event.registerEntityRenderer(MVEntityTypes.ARMADILLO.get(), ArmadilloRenderer::new);
         event.registerEntityRenderer(MVEntityTypes.CRAB.get(), CrabRenderer::new);
         event.registerEntityRenderer(MVEntityTypes.PENGUIN.get(), PenguinRenderer::new);
+        event.registerEntityRenderer(MVEntityTypes.GRAPPLING_HOOK.get(), GrapplingHookRenderer::new);
     }
 
     @SubscribeEvent

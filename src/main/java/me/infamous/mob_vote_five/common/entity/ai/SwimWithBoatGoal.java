@@ -1,12 +1,8 @@
 package me.infamous.mob_vote_five.common.entity.ai;
 
-import java.util.List;
-import javax.annotation.Nullable;
-
 import me.infamous.mob_vote_five.common.entity.Swimmer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
@@ -14,6 +10,9 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.phys.Vec3;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 public class SwimWithBoatGoal<T extends PathfinderMob & Swimmer> extends Goal {
    private final float closeEnough;
@@ -52,7 +51,8 @@ public class SwimWithBoatGoal<T extends PathfinderMob & Swimmer> extends Goal {
    }
 
    private boolean isDriving(Player following) {
-      return Mth.abs(following.xxa) > 0.0F || Mth.abs(following.zza) > 0.0F;
+      //return Mth.abs(following.xxa) > 0.0F || Mth.abs(following.zza) > 0.0F;
+      return true;
    }
 
    @Override

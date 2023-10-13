@@ -3,6 +3,7 @@ package me.infamous.mob_vote_five.common.registry;
 import me.infamous.mob_vote_five.MobVote2023;
 import me.infamous.mob_vote_five.common.entity.Armadillo;
 import me.infamous.mob_vote_five.common.entity.Crab;
+import me.infamous.mob_vote_five.common.entity.GrapplingHookEntity;
 import me.infamous.mob_vote_five.common.entity.Penguin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -16,7 +17,6 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.stream.Collectors;
 
 public class MVEntityTypes {
-
     private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MobVote2023.MODID);
 
     public static final RegistryObject<EntityType<Armadillo>> ARMADILLO = register("armadillo",
@@ -31,6 +31,12 @@ public class MVEntityTypes {
             EntityType.Builder.of(Penguin::new, MobCategory.CREATURE)
                     .sized(0.7F, 1.2F)
                     .clientTrackingRange(10));
+
+    public static final RegistryObject<EntityType<GrapplingHookEntity>> GRAPPLING_HOOK = register("grappling_hook",
+            EntityType.Builder.<GrapplingHookEntity>of(GrapplingHookEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .clientTrackingRange(4)
+                    .updateInterval(20));
 
     public static Iterable<EntityType<?>> getKnownEntities(){
         return ENTITY_TYPES.getEntries().stream().map(RegistryObject::get).collect(Collectors.toList());
