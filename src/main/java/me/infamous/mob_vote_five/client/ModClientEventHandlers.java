@@ -1,6 +1,7 @@
 package me.infamous.mob_vote_five.client;
 
 import me.infamous.mob_vote_five.MobVote2023;
+import me.infamous.mob_vote_five.client.keybinding.MVKeyMapping;
 import me.infamous.mob_vote_five.client.renderer.*;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
@@ -9,6 +10,7 @@ import net.minecraft.client.renderer.entity.WolfRenderer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -21,6 +23,11 @@ public class ModClientEventHandlers {
         event.registerEntityRenderer(MVEntityTypes.CRAB.get(), CrabRenderer::new);
         event.registerEntityRenderer(MVEntityTypes.PENGUIN.get(), PenguinRenderer::new);
         event.registerEntityRenderer(MVEntityTypes.GRAPPLING_HOOK.get(), GrapplingHookRenderer::new);
+    }
+
+    @SubscribeEvent
+    static void onRenderRegistry(RegisterKeyMappingsEvent event){
+        event.register(MVKeyMapping.KEY_KICK_ARMADILLO);
     }
 
     @SubscribeEvent

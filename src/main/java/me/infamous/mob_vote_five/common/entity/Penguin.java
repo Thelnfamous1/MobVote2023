@@ -7,7 +7,6 @@ import me.infamous.mob_vote_five.common.entity.ai.StumbleGoal;
 import me.infamous.mob_vote_five.common.entity.ai.SwimWithBoatGoal;
 import me.infamous.mob_vote_five.common.entity.ai.turtlelike.*;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
-import me.infamous.mob_vote_five.common.registry.MVMobEffects;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -21,11 +20,11 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.TimeUtil;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -87,7 +86,6 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
     private final AnimationFactory animationFactory = GeckoLibUtil.createFactory(this);
     private int layEggCounter;
     private boolean isLandNavigator;
-    private Entity pushTarget;
     private int rideTimeStamp;
     private WiggleMotion wiggleMotion = WiggleMotion.CENTER_TO_LEFT;
 
@@ -136,7 +134,7 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
 
     @Override
     protected void registerGoals() {
-        this.goalSelector.addGoal(0, new StumbleGoal<>(this, 100, FALL_DURATION));
+        this.goalSelector.addGoal(0, new StumbleGoal<>(this, TimeUtil.rangeOfSeconds(25, 40), FALL_DURATION));
         this.goalSelector.addGoal(0, new BreathAirGoal(this)); // dolphin
         this.goalSelector.addGoal(0, new LeaveWaterGoal<>(this)); // custom
         //this.goalSelector.addGoal(0, new TryFindWaterGoal(this)); // dolphin
@@ -488,14 +486,16 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
 
     @Override
     public void startSwimmingWithPlayer(Player player) {
-        player.addEffect(new MobEffectInstance(MVMobEffects.PENGUINS_GRACE.get(), 100), this);
+        //player.addEffect(new MobEffectInstance(MVMobEffects.PENGUINS_GRACE.get(), 100), this);
     }
 
     @Override
     public void tickSwimmingWithPlayer(Player player) {
+        /*
         if (player.isSwimming() && player.level.random.nextInt(6) == 0) {
             player.addEffect(new MobEffectInstance(MVMobEffects.PENGUINS_GRACE.get(), 100), this);
         }
+         */
     }
 
     @Override
@@ -664,7 +664,7 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
     private <T extends IAnimatable> PlayState predicate(AnimationEvent<T> event) {
         if(this.isFallingOver()){
             event.getController().setAnimation(FALL_ANIMATION_STATE);
-        } if(this.isInWater() || this.isBreaching()){
+        } else if(this.isInWater() || this.isBreaching()){
             event.getController().setAnimation(SWIM_ANIMATION_STATE);
         } else if(event.isMoving()){
             event.getController().setAnimation(WALK_ANIMATION_STATE);
@@ -681,7 +681,7 @@ public class Penguin extends Animal implements IAnimatable, Swimmer, HasHome, Tr
 
     @Override
     public boolean canStumble() {
-        return this.onGround && !this.isInWater() && this.getMoveControl().hasWanted() && !this.hasEgg();
+        return !this.getNavigation().isDone() && this.onGround && !this.isInWater() && !this.hasEgg();
     }
 
     @Override

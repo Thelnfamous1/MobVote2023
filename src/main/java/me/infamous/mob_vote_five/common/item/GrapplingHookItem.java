@@ -1,6 +1,5 @@
 package me.infamous.mob_vote_five.common.item;
 
-import me.infamous.mob_vote_five.MobVote2023;
 import me.infamous.mob_vote_five.common.duck.Grappler;
 import me.infamous.mob_vote_five.common.entity.GrapplingHookEntity;
 import net.minecraft.sounds.SoundEvents;
@@ -127,7 +126,7 @@ public abstract class GrapplingHookItem extends Item {
         if (grapplingHook != null) {
             pLevel.playSound(null, pPlayer, SoundEvents.PISTON_CONTRACT, SoundSource.PLAYERS, 1.0F, 1.0F);
         }
-        MobVote2023.LOGGER.info("{} has started using a grappling hook!", pPlayer);
+        //MobVote2023.LOGGER.info("{} has started using a grappling hook!", pPlayer);
         return InteractionResultHolder.consume(itemInHand);
     }
 }

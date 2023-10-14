@@ -74,10 +74,18 @@ public class GrapplingHookEntity extends AbstractArrow implements IAnimatable, I
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        if(!this.level.isClientSide && this.getOwner() instanceof Player player && ((Grappler)player).getGrapplingHook() != this){
+            this.discard();
+        }
+    }
+
+    @Override
     public void playerTouch(Player pEntity) {
         if (!this.level.isClientSide && (this.inGround || this.isNoPhysics()) && this.shakeTime <= 0) {
             if (this.tryPickup(pEntity)) {
-                if(pEntity.getUseItem().getItem() instanceof GrapplingHookItem) pEntity.stopUsingItem();
+                if(pEntity.getUseItem().getItem() instanceof GrapplingHookItem && ((Grappler)pEntity).getGrapplingHook() == this) pEntity.stopUsingItem();
                 pEntity.take(this, 1);
                 this.discard();
             }

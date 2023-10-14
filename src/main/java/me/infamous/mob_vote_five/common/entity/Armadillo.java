@@ -16,10 +16,12 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -27,6 +29,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -41,7 +44,6 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
-import java.util.UUID;
 import java.util.function.Predicate;
 
 public class Armadillo extends Animal implements IAnimatable, Hider{
@@ -49,8 +51,6 @@ public class Armadillo extends Animal implements IAnimatable, Hider{
     public static final Predicate<Entity> REVEAL_PREDICATE = (target) -> {
         return !(target instanceof Player player) || !player.isSpectator() && !player.isCreative() && !isWearingLeather(player);
     };
-    private static final UUID COVERED_ARMOR_MODIFIER_UUID = UUID.fromString("2b0a0d7f-c097-4de0-ad8b-1079ede7e85c");
-    private static final AttributeModifier COVERED_ARMOR_MODIFIER = new AttributeModifier(COVERED_ARMOR_MODIFIER_UUID, "Covered armor bonus", 20.0D, AttributeModifier.Operation.ADDITION);
     private static final Ingredient FOOD_ITEMS = Ingredient.of(MVTags.ARMADILLO_FOOD);
     private static final EntityDataAccessor<Hider.HideState> DATA_HIDE_STATE = SynchedEntityData.defineId(Armadillo.class, MVDataSerializers.DIG_STATE.get());
     protected static final AnimationBuilder APPEAR_ANIMATION_STATE = new AnimationBuilder().addAnimation("animation.armadillo.appear", ILoopType.EDefaultLoopTypes.HOLD_ON_LAST_FRAME);
@@ -206,11 +206,38 @@ public class Armadillo extends Animal implements IAnimatable, Hider{
     @Override
     public void setHideState(HideState hideState) {
         this.entityData.set(DATA_HIDE_STATE, hideState);
-        if(!this.level.isClientSide) {
-            this.getAttribute(Attributes.ARMOR).removeModifier(COVERED_ARMOR_MODIFIER);
-            if (hideState == HideState.HIDDEN) {
-                this.getAttribute(Attributes.ARMOR).addPermanentModifier(COVERED_ARMOR_MODIFIER);
-            }
+    }
+
+    @Override
+    public boolean hurt(DamageSource pSource, float pAmount) {
+        if(!this.isRevealed() && pSource.getDirectEntity() != null){
+            Entity directEntity = pSource.getDirectEntity();
+            this.applyCombatKnockback(directEntity, 1.0F);
+            this.setRot(directEntity.getYRot(), directEntity.getXRot());
+            return false;
+        } else{
+            return super.hurt(pSource, pAmount);
+        }
+    }
+
+    @Override
+    public void setRot(float pYRot, float pXRot) {
+        super.setRot(pYRot, pXRot);
+    }
+
+    public void applyCombatKnockback(Entity directEntity, float scale) {
+        double xDist = directEntity.getX() - this.getX();
+
+        double zDist;
+        for(zDist = directEntity.getZ() - this.getZ(); xDist * xDist + zDist * zDist < 1.0E-4D; zDist = (Math.random() - Math.random()) * 0.01D) {
+            xDist = (Math.random() - Math.random()) * 0.01D;
+        }
+        this.knockback(0.4F * scale, xDist, zDist);
+        if (directEntity instanceof LivingEntity attacker) {
+            AttributeInstance attackKnockback = attacker.getAttribute(Attributes.ATTACK_KNOCKBACK);
+            float knockback = attackKnockback != null ? (float)attackKnockback.getValue() : 0.0F;
+            knockback += (float)EnchantmentHelper.getKnockbackBonus(attacker);
+            this.knockback(knockback * 0.5F * scale, Mth.sin(attacker.getYRot() * Mth.DEG_TO_RAD), -Mth.cos(attacker.getYRot() * Mth.DEG_TO_RAD));
         }
     }
 

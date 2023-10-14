@@ -7,6 +7,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
+import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.phys.Vec3;
@@ -15,6 +16,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class SwimWithBoatGoal<T extends PathfinderMob & Swimmer> extends Goal {
+   private static final TargetingConditions TARGETING_CONDITIONS = TargetingConditions.forNonCombat().range(64.0D);
    private final float closeEnough;
    private final float tooFar;
    private final double speedModifier;
@@ -36,12 +38,12 @@ public class SwimWithBoatGoal<T extends PathfinderMob & Swimmer> extends Goal {
       if(!this.swimmer.wantsToSwimAway()){
          return false;
       }
-      List<Boat> boats = this.swimmer.level.getEntitiesOfClass(Boat.class, this.swimmer.getBoundingBox().inflate(5.0D));
+      List<Player> nearbyPlayers = this.swimmer.level.getNearbyPlayers(TARGETING_CONDITIONS, this.swimmer, this.swimmer.getBoundingBox().inflate(8.0D));
       boolean foundBoat = false;
 
-      for(Boat boat : boats) {
-         Entity driver = boat.getControllingPassenger();
-         if (driver instanceof Player player && this.isDriving(player)) {
+      for(Player player : nearbyPlayers) {
+         Entity vehicle = player.getVehicle();
+         if (vehicle instanceof Boat boat && boat.getControllingPassenger() == player && this.isDriving(player)) {
             foundBoat = true;
             break;
          }
@@ -67,8 +69,8 @@ public class SwimWithBoatGoal<T extends PathfinderMob & Swimmer> extends Goal {
 
    @Override
    public void start() {
-      for(Boat boat : this.swimmer.level.getEntitiesOfClass(Boat.class, this.swimmer.getBoundingBox().inflate(5.0D))) {
-         if (boat.getControllingPassenger() != null && boat.getControllingPassenger() instanceof Player player) {
+      for(Player player : this.swimmer.level.getNearbyPlayers(TARGETING_CONDITIONS, this.swimmer, this.swimmer.getBoundingBox().inflate(5.0D))) {
+         if (player.getVehicle() instanceof Boat boat && boat.getControllingPassenger() == player) {
             this.following = player;
             this.swimmer.startSwimmingWithPlayer(player);
             break;

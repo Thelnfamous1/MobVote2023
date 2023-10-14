@@ -8,6 +8,8 @@
   "item.mob_vote_five.armadillo_spawn_egg": "Armadillo Spawn Egg",
   "item.mob_vote_five.crab_claw": "Crab Claw",
   "item.mob_vote_five.penguin_spawn_egg": "Penguin Spawn Egg",
-  "item.mob_vote_five.turtle_spawn_egg": "Crab Spawn Egg",
-  "item.mob_vote_five.wolf_armor": "Wolf Armor"
+  "item.mob_vote_five.crab_spawn_egg": "Crab Spawn Egg",
+  "item.mob_vote_five.wolf_armor": "Wolf Armor",
+  "key.kick_armadillo": "Kick Armadillo",
+  "key.retract_grappling_hook": "Retract Grappling Hook"
 }

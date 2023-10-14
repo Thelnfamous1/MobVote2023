@@ -3,6 +3,7 @@ package me.infamous.mob_vote_five.common.datagen;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Pair;
 import me.infamous.mob_vote_five.MobVote2023;
+import me.infamous.mob_vote_five.client.keybinding.MVKeyMapping;
 import me.infamous.mob_vote_five.common.registry.MVEntityTypes;
 import me.infamous.mob_vote_five.common.registry.MVItems;
 import me.infamous.mob_vote_five.common.registry.MVMobEffects;
@@ -72,6 +73,8 @@ public class DataGenHandler {
                 this.add(MVItems.CRAB_CLAW.get(), "Crab Claw");
                 this.add(MVItems.WOLF_ARMOR.get(), "Wolf Armor");
                 this.add(MVMobEffects.PENGUINS_GRACE.get(), "Penguin's Grace");
+                this.add(MVKeyMapping.KICK_ARMADILLO_LOCALIZATION, "Kick Armadillo");
+                this.add(MVKeyMapping.RETRACT_GRAPPLING_HOOK, "Retract Grappling Hook");
             }
         });
 
