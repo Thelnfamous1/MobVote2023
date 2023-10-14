@@ -69,7 +69,7 @@ public class SwimWithBoatGoal<T extends PathfinderMob & Swimmer> extends Goal {
 
    @Override
    public void start() {
-      for(Player player : this.swimmer.level.getNearbyPlayers(TARGETING_CONDITIONS, this.swimmer, this.swimmer.getBoundingBox().inflate(5.0D))) {
+      for(Player player : this.swimmer.level.getNearbyPlayers(TARGETING_CONDITIONS, this.swimmer, this.swimmer.getBoundingBox().inflate(8.0D))) {
          if (player.getVehicle() instanceof Boat boat && boat.getControllingPassenger() == player) {
             this.following = player;
             this.swimmer.startSwimmingWithPlayer(player);
@@ -89,6 +89,8 @@ public class SwimWithBoatGoal<T extends PathfinderMob & Swimmer> extends Goal {
 
    @Override
    public void tick() {
+      if(this.following == null) return;
+
       boolean driving = this.isDriving(this.following);
       float speed = this.currentGoal == MoveGoal.GO_IN_BOAT_DIRECTION ? (driving ? 0.01F : 0.0F) : 0.015F;
       this.swimmer.moveRelative(speed, new Vec3(this.swimmer.xxa, this.swimmer.yya, this.swimmer.zza));
